@@ -1,6 +1,5 @@
 import Componente1 from '@/components/Componente1/Componente1'
 
-
 export default function page() {
 
 const magia = <p>OLA</p>

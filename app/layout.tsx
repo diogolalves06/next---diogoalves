@@ -39,9 +39,13 @@ export default function RootLayout({
           gap-5
           "
         >
+          <Link href= "/">Home</Link>
           <Link href= "/route">Route</Link>
           <Link href= "/caracteristicas">Caracteristicas</Link>
-          
+          <Link href= "/tecnologias">Tecnologias</Link>
+          <Link href= "/projetos">Projetos</Link>
+        
+
         </nav>
         <main className="
         bg-pink-500
