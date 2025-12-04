@@ -8,7 +8,7 @@ const frase = "O cristino ronaldo é o melhor"
   return(
     <div>
       <h2>VIVA O NEXT</h2>
-      <p>VÂO TODOS PARA O CA....</p>
+      <p>ISTO É MUITO FIXE</p>
       {magia}
       <p><strong>{frase}</strong></p>
       <Componente1 />
