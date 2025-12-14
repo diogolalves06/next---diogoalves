@@ -49,7 +49,7 @@ export default function RootLayout({
 
         </nav>
         <main className="
-        bg-pink-500
+        bg-blue-500
         w-[70vw]
         min-h[40vh]
         p-3

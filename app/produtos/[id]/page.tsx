@@ -16,7 +16,6 @@ const fetcher = async (url: string) => {
 };
 
 export default function ProdutoPage({ params }: { params: Promise<{ id: string }> }) {
-  // ✅ Usar React.use() para “desenrolar” a Promise de params
   const { id } = React.use(params);
 
   const { data, error, isLoading } = useSWR<Product>(
@@ -35,7 +34,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ id: string }
   if (error) {
     return (
       <div className="text-center text-red-600 mt-10">
-        Ocorreu um erro ao carregar o produto 😢
+        Ocorreu um erro ao carregar o produto
       </div>
     );
   }
