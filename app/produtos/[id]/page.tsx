@@ -1,21 +1,48 @@
-import { useRouter } from 'next/router';
+"use client";
 
-const produtos = [
-  { id: 1, nome: "Camisa", descricao: "Camisa", imagem: "/images/camisa.jpg" },
-  { id: 2, nome: "Caneca", descricao: "Caneca personalizada", imagem: "/images/caneca.jpg" },
-];
+import React from "react";
+import useSWR from "swr";
+import ProdutoDetalhe from "@/components/ProdutoDetalhe/ProdutoDetalhe";
+import { Product } from "@/models/interfaces";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ProdutoPage({ params }) {
-  const produto = produtos.find(p => p.id === parseInt(params.id));
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.error("Erro HTTP:", res.status, res.statusText);
+    throw new Error("Erro ao carregar o produto");
+  }
+  return res.json();
+};
 
-  if (!produto) return <p>Produto não encontrado.</p>;
+export default function ProdutoPage({ params }: { params: Promise<{ id: string }> }) {
+  // ✅ Usar React.use() para “desenrolar” a Promise de params
+  const { id } = React.use(params);
 
-  return (
-    <div>
-      <h1>{produto.nome}</h1>
-      <img src={produto.imagem} alt={produto.nome} width={200} />
-      <p>{produto.descricao}</p>
-      <button>Remover Produto</button> {}
-    </div>
+  const { data, error, isLoading } = useSWR<Product>(
+    `https://deisishop.pythonanywhere.com/products/${id}`,
+    fetcher
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Skeleton className="w-16 h-16 rounded-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-600 mt-10">
+        Ocorreu um erro ao carregar o produto 😢
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <div className="text-center mt-10">Produto não encontrado.</div>;
+  }
+
+  return <ProdutoDetalhe produto={data} />;
 }
