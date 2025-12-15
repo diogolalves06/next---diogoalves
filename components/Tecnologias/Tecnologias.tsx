@@ -1,3 +1,4 @@
+import { propagateServerField } from "next/dist/server/lib/render-server"
 
 interface TecnologiasProps {
     titulo: string
@@ -5,7 +6,10 @@ interface TecnologiasProps {
 
 }  
 
+
+
 export default function Tecnologias({titulo} : TecnologiasProps) {
+
     return (
         <div>
             <h2>{titulo}</h2>
