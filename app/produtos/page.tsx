@@ -21,6 +21,10 @@ export default function ProdutosPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [isStudent, setIsStudent] = useState(false);
   const [coupon, setCoupon] = useState("");
+
+  // 👉 NOVO CAMPO OBRIGATÓRIO
+  const [customerName, setCustomerName] = useState("");
+
   const [purchaseMessage, setPurchaseMessage] = useState("");
   const [purchaseResponse, setPurchaseResponse] = useState<any>(null);
 
@@ -44,12 +48,23 @@ export default function ProdutosPage() {
   };
 
   const buy = () => {
+    // 🚫 VALIDAÇÃO: nome não pode ser null/vazio
+    if (!customerName.trim()) {
+      setPurchaseMessage("⚠️ O nome é obrigatório para finalizar a compra.");
+      return;
+    }
+
+    if (cart.length === 0) {
+      setPurchaseMessage("O carrinho está vazio.");
+      return;
+    }
+
     fetch("https://deisishop.pythonanywhere.com/buy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         products: cart.map((product) => product.id),
-        name: "Cliente DEISI",
+        name: customerName.trim(), // 👈 agora vem do input
         student: isStudent,
         coupon: coupon.trim(),
       }),
@@ -59,15 +74,18 @@ export default function ProdutosPage() {
         if (data.detail) {
           throw new Error(data.detail);
         }
-        console.log("Compra realizada:", data);
+
         setCart([]);
         localStorage.removeItem("cart");
 
-        setPurchaseResponse(data);
+        setPurchaseResponse({
+          ...data,
+          customerName: customerName.trim(),
+        });
         setPurchaseMessage("");
+        setCustomerName(""); // limpa após compra
       })
       .catch((error) => {
-        console.error("Erro ao comprar:", error);
         setPurchaseMessage(`Erro: ${error.message}`);
         setPurchaseResponse(null);
       });
@@ -96,7 +114,7 @@ export default function ProdutosPage() {
     <div className="p-8">
       <h1 className="text-3xl font-bold text-center mb-8">DEISI Shop</h1>
 
-      {/* Grelha de produtos */}
+      {/* Produtos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {data.map((produto) => (
           <ProdutoCard
@@ -129,8 +147,17 @@ export default function ProdutosPage() {
               Total: {total.toFixed(2)} €
             </p>
 
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-              <label className="flex items-center gap-2 mb-4">
+            <div className="mt-6 p-4 bg-gray-100 rounded-lg space-y-4">
+              {/* 🔴 CAMPO OBRIGATÓRIO */}
+              <input
+                type="text"
+                placeholder="Nome do cliente (obrigatório)"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="border border-gray-300 rounded-lg px-4 py-2 w-full"
+              />
+
+              <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={isStudent}
@@ -145,12 +172,12 @@ export default function ProdutosPage() {
                 placeholder="Cupão de desconto"
                 value={coupon}
                 onChange={(e) => setCoupon(e.target.value)}
-                className="border border-gray-300 rounded-lg px-4 py-2 w-full mb-4"
+                className="border border-gray-300 rounded-lg px-4 py-2 w-full"
               />
 
               <button
                 onClick={buy}
-                className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600"
+                className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 disabled:opacity-50"
               >
                 Comprar
               </button>
@@ -167,15 +194,12 @@ export default function ProdutosPage() {
             <p>
               <strong>Total:</strong> {purchaseResponse.totalCost} €
             </p>
-            {purchaseResponse.error && (
-              <p className="text-red-600 mt-2">
-                <strong>Erro:</strong> {purchaseResponse.error}
-              </p>
-            )}
+            <p>
+              <strong>Cliente:</strong> {purchaseResponse.customerName}
+            </p>
           </div>
         )}
 
-        {/* Mensagem de erro */}
         {purchaseMessage && (
           <p className="mt-4 text-center text-red-600 font-semibold">
             {purchaseMessage}
