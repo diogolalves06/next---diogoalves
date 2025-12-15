@@ -68,7 +68,7 @@ export default function ProdutosPage() {
       })
       .catch((error) => {
         console.error("Erro ao comprar:", error);
-        setPurchaseMessage(`❌ Erro: ${error.message}`);
+        setPurchaseMessage(`Erro: ${error.message}`);
         setPurchaseResponse(null);
       });
   };
@@ -83,7 +83,7 @@ export default function ProdutosPage() {
   if (error)
     return (
       <div className="text-center text-red-600 mt-10">
-        Ocorreu um erro ao carregar os produtos 😢
+        Ocorreu um erro ao carregar os produtos
       </div>
     );
 
@@ -94,7 +94,7 @@ export default function ProdutosPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">🛍️ DEISI Shop</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">DEISI Shop</h1>
 
       {/* Grelha de produtos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -109,7 +109,7 @@ export default function ProdutosPage() {
 
       {/* Carrinho */}
       <div className="mt-12">
-        <h2 className="text-2xl font-bold text-center mb-6">🛒 Carrinho</h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Carrinho</h2>
 
         {cart.length === 0 ? (
           <p className="text-center text-gray-600">O carrinho está vazio.</p>
@@ -126,7 +126,7 @@ export default function ProdutosPage() {
             </div>
 
             <p className="text-right text-xl font-semibold mt-6">
-              Total: 💶 {total.toFixed(2)} €
+              Total: {total.toFixed(2)} €
             </p>
 
             <div className="mt-6 p-4 bg-gray-100 rounded-lg">

@@ -32,7 +32,8 @@ export default function RootLayout({
         min-h-screen 
         flex flex-col 
         justify-center 
-        items-center" >
+        items-center
+        bg-gray-400" >
 
         <header>REACT & NEXT.JS</header>
         <nav
@@ -59,8 +60,8 @@ export default function RootLayout({
         ">
             {children}
         </main>
-        <footer>
-          DIW
+        <footer className="w-full flex flex-col justify-center items-center gap-2">
+          <p>DIW</p>
           <Relogio />
         </footer>
       </body>
