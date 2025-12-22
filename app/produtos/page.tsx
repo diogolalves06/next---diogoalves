@@ -21,12 +21,14 @@ export default function ProdutosPage() {
   const [cart, setCart] = useState<Product[]>([]);
   const [isStudent, setIsStudent] = useState(false);
   const [coupon, setCoupon] = useState("");
-
-  // 👉 NOVO CAMPO OBRIGATÓRIO
   const [customerName, setCustomerName] = useState("");
-
   const [purchaseMessage, setPurchaseMessage] = useState("");
   const [purchaseResponse, setPurchaseResponse] = useState<any>(null);
+
+  // 🔍 Estados de pesquisa e ordenação
+  const [search, setSearch] = useState("");
+  const [filteredData, setFilteredData] = useState<Product[]>([]);
+  const [sortOption, setSortOption] = useState("none");
 
   useEffect(() => {
     const saved = localStorage.getItem("cart");
@@ -36,6 +38,46 @@ export default function ProdutosPage() {
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  // 🔄 Atualiza filteredData sempre que search, sortOption ou data mudam
+  useEffect(() => {
+    if (!data) return;
+
+    // 1️⃣ Filtragem
+    const lowerSearch = search.toLowerCase();
+    let produtosFiltrados = data.filter((produto) =>
+      (produto.title?.toLowerCase() || "").includes(lowerSearch)
+    );
+
+    // 2️⃣ Ordenação
+    switch (sortOption) {
+      case "name-asc":
+        produtosFiltrados.sort((a, b) =>
+          a.title.localeCompare(b.title, "pt", { sensitivity: "base" })
+        );
+        break;
+      case "name-desc":
+        produtosFiltrados.sort((a, b) =>
+          b.title.localeCompare(a.title, "pt", { sensitivity: "base" })
+        );
+        break;
+ case "price-asc":
+  produtosFiltrados.sort(
+    (a, b) => parseFloat(a.price as unknown as string) - parseFloat(b.price as unknown as string)
+  );
+  break;
+
+case "price-desc":
+  produtosFiltrados.sort(
+    (a, b) => parseFloat(b.price as unknown as string) - parseFloat(a.price as unknown as string)
+  );
+  break;
+      default:
+        break;
+    }
+
+    setFilteredData(produtosFiltrados);
+  }, [search, sortOption, data]);
 
   const addToCart = (produto: Product) => {
     if (!cart.find((p) => p.id === produto.id)) {
@@ -48,7 +90,6 @@ export default function ProdutosPage() {
   };
 
   const buy = () => {
-    // 🚫 VALIDAÇÃO: nome não pode ser null/vazio
     if (!customerName.trim()) {
       setPurchaseMessage("⚠️ O nome é obrigatório para finalizar a compra.");
       return;
@@ -64,26 +105,20 @@ export default function ProdutosPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         products: cart.map((product) => product.id),
-        name: customerName.trim(), // 👈 agora vem do input
+        name: customerName.trim(),
         student: isStudent,
         coupon: coupon.trim(),
       }),
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.detail) {
-          throw new Error(data.detail);
-        }
+        if (data.detail) throw new Error(data.detail);
 
         setCart([]);
         localStorage.removeItem("cart");
-
-        setPurchaseResponse({
-          ...data,
-          customerName: customerName.trim(),
-        });
+        setPurchaseResponse({ ...data, customerName: customerName.trim() });
         setPurchaseMessage("");
-        setCustomerName(""); // limpa após compra
+        setCustomerName("");
       })
       .catch((error) => {
         setPurchaseMessage(`Erro: ${error.message}`);
@@ -114,9 +149,32 @@ export default function ProdutosPage() {
     <div className="p-8">
       <h1 className="text-3xl font-bold text-center mb-8">DEISI Shop</h1>
 
-      {/* Produtos */}
+      {/* 🔍 Pesquisa e Ordenação */}
+      <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
+        <input
+          type="text"
+          placeholder="Pesquisar produto por nome..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full max-w-md"
+        />
+
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 w-full max-w-xs"
+        >
+          <option value="none">Ordenar por...</option>
+          <option value="name-asc">Nome (A–Z)</option>
+          <option value="name-desc">Nome (Z–A)</option>
+          <option value="price-asc">Preço (crescente)</option>
+          <option value="price-desc">Preço (decrescente)</option>
+        </select>
+      </div>
+
+      {/* 🛒 Lista de produtos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {data.map((produto) => (
+        {filteredData.map((produto) => (
           <ProdutoCard
             key={produto.id}
             produto={produto}
@@ -148,7 +206,6 @@ export default function ProdutosPage() {
             </p>
 
             <div className="mt-6 p-4 bg-gray-100 rounded-lg space-y-4">
-              {/* 🔴 CAMPO OBRIGATÓRIO */}
               <input
                 type="text"
                 placeholder="Nome do cliente (obrigatório)"

@@ -27,7 +27,7 @@ export default function ProdutoCard({ produto, onAdd, onRemove }: ProdutoCardPro
         className="rounded-xl mb-2"
       />
       <h2 className="text-lg font-semibold text-center">{produto.title}</h2>
-      <p className="text-gray-600 mt-1">{produto.price} €</p>
+      <p className="text-gray-600 mt-1">{Number(produto.price).toFixed(2)} €</p>
 
       <button
         onClick={() => router.push(`/produtos/${produto.id}`)}

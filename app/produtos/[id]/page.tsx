@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import useSWR from "swr";
 import ProdutoDetalhe from "@/components/ProdutoDetalhe/ProdutoDetalhe";
 import { Product } from "@/models/interfaces";
@@ -15,8 +14,8 @@ const fetcher = async (url: string) => {
   return res.json();
 };
 
-export default function ProdutoPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = React.use(params);
+export default function ProdutoPage({ params }: { params: { id: string } }) {
+  const { id } = params;
 
   const { data, error, isLoading } = useSWR<Product>(
     `https://deisishop.pythonanywhere.com/products/${id}`,
@@ -34,7 +33,7 @@ export default function ProdutoPage({ params }: { params: Promise<{ id: string }
   if (error) {
     return (
       <div className="text-center text-red-600 mt-10">
-        Ocorreu um erro ao carregar o produto
+        Ocorreu um erro ao carregar o produto.
       </div>
     );
   }
